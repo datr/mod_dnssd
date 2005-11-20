@@ -1,3 +1,5 @@
+# $Id$
+
 APXS=/usr/bin/apxs2
 APACHECTL=apache2ctl
 LIBS=$(shell pkg-config --libs howl)
@@ -18,12 +20,11 @@ reload: install restart
 
 start:
 	$(APACHECTL) start
-	
+
 restart:
 	$(APACHECTL) restart
-	
+
 stop:
 	$(APACHECTL) stop
-	
 
 .PHONY: all install clean reload start restart stop
