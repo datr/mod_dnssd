@@ -2,16 +2,16 @@
 
 APXS=/usr/bin/apxs2
 APACHECTL=apache2ctl
-LIBS=$(shell pkg-config --libs howl)
-CFLAGS=$(shell pkg-config --cflags howl)
+LIBS=$(shell pkg-config --libs avahi-client)
+CFLAGS=$(shell pkg-config --cflags avahi-client)
 
-all: mod_dnssd.so
+all: mod_dnssd.la
 
-mod_dnssd.so: mod_dnssd.c
+mod_dnssd.la: mod_dnssd.c
 	$(APXS) -c $(CFLAGS) $(LIBS) mod_dnssd.c
 
-install: all
-	$(APXS) -i -a -n dnssd mod_dnssd.so
+install: mod_dnssd.la
+	$(APXS) -i -a mod_dnssd.la 
 
 clean:
 	rm -rf *.o *.so *.loT .deps/ *.la *.lo *.slo .libs
