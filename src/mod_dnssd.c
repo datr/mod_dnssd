@@ -128,7 +128,7 @@ static void add_service(struct runtime_data *r, const char *host_name, uint16_t 
 static void assemble_services(struct runtime_data *r) {
     ap_directive_t *v;
     const char *default_host_name = NULL;
-    uint16_t default_port = 80;
+    uint16_t default_port = 0;
     struct service_data *j;
     apr_pool_t *t;
     
@@ -141,16 +141,17 @@ static void assemble_services(struct runtime_data *r) {
 
         if (strcasecmp(v->directive, "ServerName") == 0)
             default_host_name = ap_getword_conf(t, &a);
+        
         else if (strcasecmp(v->directive, "Listen") == 0) {
             char *sp;
-
+            
             if (!default_port) {
                 char *colon;
 
                 sp = ap_getword_conf(t, &a);
                 if ((colon = strrchr(sp, ':')))
                     sp = colon + 1;
-                
+
                 default_port = (uint16_t) atoi(sp);
             }
         } else if (strcasecmp(v->directive, "DNSSDServicePort") == 0)
@@ -270,6 +271,9 @@ static void assemble_services(struct runtime_data *r) {
 
         apr_pool_destroy(p_loop);
     }
+
+    if (!default_port)
+        default_port = 80;
     
     /* Fill in missing data in all services */
     for (j = r->services; j; j = j->next) {
