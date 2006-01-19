@@ -7,8 +7,8 @@ CFLAGS=-Wc,"@CFLAGS@" @AVAHI_CFLAGS@
 
 all: mod_dnssd.la
 
-mod_dnssd.la: mod_dnssd.c
-	$(APXS) -c $(CFLAGS) $(LIBS) mod_dnssd.c
+mod_dnssd.la: @srcdir@/mod_dnssd.c
+	$(APXS) -c $(CFLAGS) $(LIBS) $<
 
 install: mod_dnssd.la
 	$(APXS) -i -a mod_dnssd.la 
