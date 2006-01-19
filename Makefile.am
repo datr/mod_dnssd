@@ -15,25 +15,21 @@
 # permissions and limitations under the License.
 
 EXTRA_DIST=bootstrap.sh LICENSE src/mod_dnssd.c src/Makefile.in
-SUBDIRS=src
-# doc
+SUBDIRS=src doc
 
-#MAINTAINERCLEANFILES = README
-#noinst_DATA = README LICENSE
+MAINTAINERCLEANFILES = README
+noinst_DATA = README LICENSE
 
-#README:
-#	rm -f README
-#	$(MAKE) -C doc README
-#	cd $(srcdir) && ln -s doc/README README
+README:
+	rm -f README
+	$(MAKE) -C doc README
+	cd $(srcdir) && ln -s doc/README README
 
-#homepage: all dist
-#	test -d $$HOME/homepage/private
-#	mkdir -p $$HOME/homepage/private/projects/mod_mime_xattr
-#	cp *.tar.gz $$HOME/homepage/private/projects/mod_mime_xattr
-#	cp doc/README.html doc/style.css $$HOME/homepage/private/projects/mod_mime_xattr
-#	cp $$HOME/homepage/private/projects/mod_mime_xattr/README.html $$HOME/homepage/private/projects/mod_mime_xattr/index.html
+homepage: all dist
+	test -d $$HOME/homepage/private
+	mkdir -p $$HOME/homepage/private/projects/mod_dnssd
+	cp *.tar.gz $$HOME/homepage/private/projects/mod_dnssd
+	cp doc/README.html doc/style.css $$HOME/homepage/private/projects/mod_dnssd
+	ln -sf $$HOME/homepage/private/projects/mod_dnssd/README.html $$HOME/homepage/private/projects/mod_dnssd/index.html
 
-#distcleancheck:
-#	@:
-
-#.PHONY: homepage distcleancheck
+.PHONY: homepage

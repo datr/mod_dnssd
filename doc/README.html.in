@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="iso-8859-15"?> <!-- -*-html-helper-*- -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>mod_dnssd @PACKAGE_VERSION@</title>
+<link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+
+<body>
+<h1><a name="top">mod_dnssd @PACKAGE_VERSION@</a></h1>
+
+<p><i>Copyright 2006 Lennart Poettering &lt;@PACKAGE_BUGREPORT@&gt;</i></p>
+
+<ul class="toc">
+    <li><a href="#license">License</a></li>
+    <li><a href="#news">News</a></li>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#status">Current Status</a></li>
+    <li><a href="#documentation">Documentation</a></li>
+    <li><a href="#requirements">Requirements</a></li>
+    <li><a href="#installation">Installation</a></li>
+    <li><a href="#acks">Acknowledgements</a></li>
+    <li><a href="#download">Download</a></li>
+</ul>
+
+<h2><a name="license">License</a></h2>
+
+<p>Copyright 2006 Lennart Poettering</p>
+
+<p>Licensed under the Apache License, Version 2.0 (the "License"); you
+may not use this file except in compliance with the License.  You may
+obtain a copy of the License at</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied.  See the License for the specific language governing
+permissions and limitations under the License.</p>
+
+<h2><a name="news">News</a></h2>
+
+<div class="news-date">Thu Jan 19 2006: </div> <p class="news-text"><a
+href="@PACKAGE_URL@mod_dnssd-0.1.tar.gz">Version 0.1</a> released,
+initial realease</p>
+
+<h2><a name="overview">Overview</a></h2>
+
+<p><tt>mod_dnssd</tt> is an <a href="http://httpd.apache.org/">Apache
+HTTPD</a> module which adds <a
+href="http://www.zeroconf.org/">Zeroconf</a> support via <a
+href="http://www.dns-sd.org/">DNS-SD</a> using <a
+href="http://avahi.org/">Avahi</a>.</p>
+
+<h2><a name="status">Status</a></h2>
+
+<p>Version @PACKAGE_VERSION@ is more or less stable and fulfills its purpose.</p>
+  
+<h2><a name="documentation">Documentation</a></h2>
+
+<p>For activating <tt>mod_dnssd</tt> just load it into the server and use the global directive <tt>DNSSDEnable</tt> to enable it: </p>
+
+<pre>
+DNSSDEnable on
+</pre>
+
+<p>That's it, nothing more is required! The module publishes all
+configured virtual hosts and the <tt>mod_userdir</tt> directories of
+all local users. For <tt>mod_userdir</tt> to work you need to load
+that module and configure it for the path <tt>~/public_html/</tt>.</p>
+
+<p>Four other directives are available: the global directive
+<tt>DNSSDAutoRegisterUserDir</tt> can be used to disable automatic
+registration of <tt>mod_userdir</tt> directories. The global directive
+<tt>DNSSDAutoRegisterVHosts</tt> can be used to disable automatic
+registration of all local virtual hosts.</tt>
+
+<p>The two directives <tt>DNSSDServiceName</tt> and
+<tt>DNSSDServiceTypes</tt> which can be placed inside a
+<tt>&lt;VirtualHost&gt;</tt> or a <tt>&lt;Location&gt;</tt> section
+can be used to define additional services for publishing or to finetune
+the service name or types of virtual hosts.</p>
+
+<h2><a name="requirements">Requirements</a></h2>
+
+<p><tt>mod_dnssd</tt> requires a current release of Apache 2.0 with
+<tt>apxs</tt> and a development installation of <a
+href="http://avahi.org/">Avahi</a> 0.6 or newer.</p>
+
+<p><tt>mod_dnssd</tt> has been developed and tested on Debian GNU/Linux
+"testing" from January 2006, it should work on most other Linux
+distributions and probably POSIX implementations since it uses GNU
+autoconf and Apache <tt>apxs</tt> for source code configuration.</p>
+
+<h2><a name="installation">Installation</a></h2>
+
+<p>As this package is made with the GNU autotools you should run
+<tt>./configure</tt> inside the distribution directory for configuring
+the source tree. After that you should run <tt>make</tt> for
+compilation and <tt>make install</tt> (as root) for installation of
+<tt>mod_dnssd</tt>.</p>
+
+<h2><a name="acks">Acknowledgements</a></h2>
+
+<p>This work was inspired by Sander Temme's and Sebastien Estienne's <a href="http://www.temme.net/sander/mod_zeroconf/">mod_zeroconf</a> module.</p>
+
+<h2><a name="download">Download</a></h2>
+
+<p>The newest release is always available from <a href="@PACKAGE_URL@">@PACKAGE_URL@</a></p>
+
+<p>The current release is <a href="@PACKAGE_URL@mod_dnssd-@PACKAGE_VERSION@.tar.gz">@PACKAGE_VERSION@</a></p>
+
+<p>Get <tt>mod_dnssd</tt>'s development sources from the <a href="http://subversion.tigris.org/">Subversion</a> <a href="svn://svn.0pointer.net/mod_dnssd">repository</a> (<a href="http://0pointer.net/cgi-bin/viewcvs.cgi/?root=mod_dnssd">viewcvs</a>): </p>
+
+<pre>svn checkout svn://svn.0pointer.net/mod_dnssd/trunk mod_dnssd</pre>
+
+<p>If you want to be notified whenever I release a new version of this software use the subscription feature of <a href="http://freshmeat.net/projects/mod_dnssd/">Freshmeat</a>.</p>
+
+<hr/>
+
+<address class="grey">Lennart Poettering &lt;@PACKAGE_BUGREPORT@&gt;, January 2006</address>
+
+<div class="grey"><i>$Id$</i></div>
+
+</body>
+</html>

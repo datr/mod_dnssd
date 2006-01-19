@@ -114,6 +114,5 @@ fi
 
 AM_CONDITIONAL([USE_LYNX], [test "x$lynx" = xyes])
 
-AC_CONFIG_FILES([src/Makefile Makefile])
-dnl AC_CONFIG_FILES([src/Makefile Makefile doc/Makefile doc/README.html])
+AC_CONFIG_FILES([src/Makefile Makefile doc/Makefile doc/README.html])
 AC_OUTPUT
