@@ -153,17 +153,20 @@ static void assemble_services(struct runtime_data *r) {
                 
                 default_port = (uint16_t) atoi(sp);
             }
+        } else if (strcasecmp(v->directive, "DNSSDServicePort") == 0)
+
+            default_port = (uint16_t) atoi(a);
             
-        } else if (strcasecmp(v->directive, "<VirtualHost") == 0) {
+        else if (strcasecmp(v->directive, "<VirtualHost") == 0) {
             const char *host_name = NULL;
-            uint16_t port = 0;
+            uint16_t vport = 0;
             const char *vname = NULL, *vtypes = NULL;
             ap_directive_t *l;
             char *colon;
             struct service_data *marker = r->services;
             
             if ((colon = strrchr(v->args, ':')))
-                port = (uint8_t) atoi(colon+1);
+                vport = (uint8_t) atoi(colon+1);
 
 /*             ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "VHOST: %s ", v->directive);  */
              
@@ -178,11 +181,14 @@ static void assemble_services(struct runtime_data *r) {
                     vname = ap_getword_conf(t, &a);
                 else if (strcasecmp(l->directive, "DNSSDServiceTypes") == 0)
                     vtypes = a;
+                else if (strcasecmp(l->directive, "DNSSDServicePort") == 0)
+                    vport = (uint16_t) atoi(a);
                 else if (strcasecmp(l->directive, "<Location") == 0) {
                     ap_directive_t *s;
                     const char *sname = NULL, *stypes = NULL;
                     char *path;
                     size_t i;
+                    uint16_t sport = 0;
                     
                     path = apr_pstrdup(t, l->args);
                     
@@ -196,21 +202,24 @@ static void assemble_services(struct runtime_data *r) {
                             sname = ap_getword_conf(t, &a);
                         else if (strcasecmp(s->directive, "DNSSDServiceTypes") == 0)
                             stypes = a;
+                        else if (strcasecmp(s->directive, "DNSSDServicePort") == 0)
+                            sport = (uint16_t) atoi(a);
                     }
 
                     if (sname)
-                        add_service(r, NULL, 0, path, sname, stypes, 0);
+                        add_service(r, NULL, sport, path, sname, stypes, 0);
                 }
             }
 
             /* Fill in missing data in <Location> based services */
             for (j = r->services; j && j != marker; j = j->next) {
-                j->port = port;
+                if (!j->pool)
+                    j->port = vport;
                 j->host_name = apr_pstrdup(r->pool, host_name);
             }
 
             if (r->global_config_data->vhost || vname || vtypes)
-                add_service(r, host_name, port, NULL, vname ? vname : host_name, vtypes, 0);
+                add_service(r, host_name, vport, NULL, vname ? vname : host_name, vtypes, 0);
         } 
     }
 
@@ -734,6 +743,24 @@ static const char *cmd_dnssd_service_type(
     return NULL;
 }
 
+static const char *cmd_dnssd_service_port(
+    cmd_parms *cmd,
+    AVAHI_GCC_UNUSED void *mconfig,
+    const char *value) {
+
+    const char *err;
+    int i;
+
+    if ((err = ap_check_cmd_context(cmd, NOT_IN_DIRECTORY|NOT_IN_FILES|NOT_IN_LIMIT)))
+        return err;
+
+    i = atoi(value);
+    if (i <= 0 || i > 0xFFFF)
+        return "Invalid port number";
+
+    return NULL;
+}
+
 static const command_rec commands[] = {
     
     AP_INIT_FLAG(
@@ -769,7 +796,15 @@ static const command_rec commands[] = {
         cmd_dnssd_service_type,
         NULL,
         OR_OPTIONS,
-        "Set on or more DNS-SD service types"),
+        "Set one or more DNS-SD service types"),
+
+    AP_INIT_ITERATE(
+        "DNSSDServicePort",
+        cmd_dnssd_service_port,
+        NULL,
+        OR_OPTIONS,
+        "Set the IP port this service should be accessed with."),
+
     
     { NULL }
 };
