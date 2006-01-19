@@ -27,7 +27,6 @@
 #include <apr_signal.h>
 
 #include <unistd.h>
-#include <pthread.h>
 
 #include <avahi-common/simple-watch.h>
 #include <avahi-common/domain.h>
