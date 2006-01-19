@@ -141,9 +141,20 @@ static void assemble_services(struct runtime_data *r) {
 
         if (strcasecmp(v->directive, "ServerName") == 0)
             default_host_name = ap_getword_conf(t, &a);
-        else if (strcasecmp(v->directive, "Port") == 0)
-            default_port = (uint16_t) atoi(ap_getword_conf(t, &a));
-        else if (strcasecmp(v->directive, "<VirtualHost") == 0) {
+        else if (strcasecmp(v->directive, "Listen") == 0) {
+            char *sp;
+
+            if (!default_port) {
+                char *colon;
+
+                sp = ap_getword_conf(t, &a);
+                if ((colon = strrchr(sp, ':')))
+                    sp = colon + 1;
+                
+                default_port = (uint16_t) atoi(sp);
+            }
+            
+        } else if (strcasecmp(v->directive, "<VirtualHost") == 0) {
             const char *host_name = NULL;
             uint16_t port = 0;
             const char *vname = NULL, *vtypes = NULL;
@@ -151,7 +162,7 @@ static void assemble_services(struct runtime_data *r) {
             char *colon;
             struct service_data *marker = r->services;
             
-            if ((colon = strchr(v->args, ':')))
+            if ((colon = strrchr(v->args, ':')))
                 port = (uint8_t) atoi(colon+1);
 
 /*             ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "VHOST: %s ", v->directive);  */
@@ -163,8 +174,6 @@ static void assemble_services(struct runtime_data *r) {
 
                 if (strcasecmp(l->directive, "ServerName") == 0)
                     host_name = ap_getword_conf(t, &a);
-                else if (strcasecmp(l->directive, "Port") == 0)
-                    port = (uint16_t) atoi(ap_getword_conf(t, &a));
                 else if (strcasecmp(l->directive, "DNSSDServiceName") == 0)
                     vname = ap_getword_conf(t, &a);
                 else if (strcasecmp(l->directive, "DNSSDServiceTypes") == 0)
