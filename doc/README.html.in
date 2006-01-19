@@ -71,17 +71,91 @@ configured virtual hosts and the <tt>mod_userdir</tt> directories of
 all local users. For <tt>mod_userdir</tt> to work you need to load
 that module and configure it for the path <tt>~/public_html/</tt>.</p>
 
-<p>Four other directives are available: the global directive
+
+<h3>Advanced Features</h3>
+
+<p>Five other directives are available: the global directive
 <tt>DNSSDAutoRegisterUserDir</tt> can be used to disable automatic
 registration of <tt>mod_userdir</tt> directories. The global directive
 <tt>DNSSDAutoRegisterVHosts</tt> can be used to disable automatic
-registration of all local virtual hosts.</tt>
+registration of all local virtual hosts.</p>
 
 <p>The two directives <tt>DNSSDServiceName</tt> and
 <tt>DNSSDServiceTypes</tt> which can be placed inside a
-<tt>&lt;VirtualHost&gt;</tt> or a <tt>&lt;Location&gt;</tt> section
-can be used to define additional services for publishing or to finetune
-the service name or types of virtual hosts.</p>
+<tt>&lt;VirtualHost&gt;</tt> or <tt>&lt;Location&gt;</tt> section
+can be used to define additional services for publishing or to
+finetune the service name or types of virtual hosts. If placed inside
+a <tt>&lt;VirtualHost&gt;</tt> you can change the service types and
+name of the attached service (if used with
+<tt>DNSSDAutoRegisterVHosts</tt> set to <tt>on</tt>) or to register a
+service for the virtual host (if used with
+<tt>DNSSDAutoRegisterVHosts</tt> disabled). <tt>DNSSDServiceTypes</tt>
+takes a list of at least one DNS-SD service type (defaults to
+<tt>_http._tcp</tt>). A good example when to pass more than one
+service type is a WebDAV server:</p>
+
+<pre>
+DNSSDServiceTypes _http._tcp _webdav._tcp
+</pre>
+
+<p>This will register the server both as HTTP and as WebDAV
+service. Please note that both services do have different types but
+share the same name! Other areas where this might become handy is when registering RSS formatted blogs or XMLRPC services.</p>
+
+<p><tt>DNSSDServiceName</tt> and <tt>DNSSDServiceTypes</tt> are
+especially useful inside a <tt>&lt;Location&gt;</tt> block. Using this
+notation you can register additional services in subdirectories of the
+server. A quick and incomplete example:</p>
+
+<pre>
+...
+DNSSDEnable On
+DNSSDAutoRegisterVHosts On
+DNSSDAutoRegisterUserDir On
+
+&lt;VirtualHost *&gt;
+    DocumentRoot /var/www
+    DNSSDServiceName "Our Little Home Web Server"
+
+    &lt;Location /doc&gt;
+        DNSSDServiceName "Documentation"
+        ...
+    &lt;/Location&gt;
+
+    &lt;Location /squirrelmail&gt;
+        DNSSDServiceName "Webmail"
+        ...
+    &lt;/Location&gt;
+
+    &lt;Location /webdav&gt;
+        DAV On
+        DNSSDServiceName "Our WebDAV folder"
+        DNSSDServiceTypes _webdav._tcp _http._tcp
+        ...
+    &lt;/Location&gt;
+
+    &lt;Location /blog.rss&gt;
+        DNSSDServiceName "The Blog"
+        DNSSDServiceTypes _rss._tcp
+        ...
+    &lt;/Location&gt;
+
+    ...
+&lt;/VirtualHost&gt;
+
+...
+</pre>
+
+<p>This will register six services: <i>Our Little Home Web Server</i>,
+<i>Documentation</i>, <i>Webmail</i> and <i>Our WebDAV folder</i> as
+type <tt>_http._tcp</tt>, <i>Our WebDAV folder</i> a second time under
+the type <tt>_webdav._tcp</tt> and finally <i>The Blog</i> as type
+<tt>_rss._tcp</tt>.</p>
+
+<p>The directive <tt>DNSSDServicePort</tt> can be used to tell
+<tt>mod_dnssd</tt> the right port number in complicated setups, where
+it fails to detect the correct one to use. It is seldomly used and you
+probably shouldn't bother.</p>
 
 <h2><a name="requirements">Requirements</a></h2>
 
