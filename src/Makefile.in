@@ -36,4 +36,4 @@ Makefile: Makefile.in
 	(cd .. && ../configure.status )
 
 
-.PHONY: all install clean reload start restart stop mostlyclean distclean maintainer-clean
+.PHONY: all install clean reload start restart stop mostlyclean distclean maintainer-clean distdir
