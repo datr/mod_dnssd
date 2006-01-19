@@ -32,6 +32,7 @@
 #include <avahi-common/domain.h>
 #include <avahi-common/error.h>
 #include <avahi-common/alternative.h>
+#include <avahi-common/gccmacro.h>
 #include <avahi-client/publish.h>
 
 #define MOD_DNSSD_USERDATA_KEY "mod-dnssd"
@@ -269,7 +270,7 @@ static void assemble_services(struct runtime_data *r) {
 
 static void create_service(struct service_data *j);
 
-void service_callback(AvahiEntryGroup *g, AvahiEntryGroupState state, void *userdata) {
+static void service_callback(AVAHI_GCC_UNUSED AvahiEntryGroup *g, AvahiEntryGroupState state, void *userdata) {
     struct service_data *j = userdata;
     
     switch (state) {
@@ -479,7 +480,7 @@ static void client_callback(AvahiClient *c, AvahiClientState state, void *userda
     
 }
 
-static void sigterm(int s) {
+static void sigterm(AVAHI_GCC_UNUSED int s) {
     const char c = 'x';
     write(sigterm_pipe_fds[1], &c, sizeof(c));
 }
@@ -609,8 +610,8 @@ static int start_child_process(apr_pool_t *p, server_rec *server, struct global_
 
 static int post_config(
     apr_pool_t *pconf,
-    apr_pool_t *plog,
-    apr_pool_t *ptemp,
+    AVAHI_GCC_UNUSED apr_pool_t *plog,
+    AVAHI_GCC_UNUSED apr_pool_t *ptemp,
     server_rec *s) {
 
     void *flag;
@@ -630,11 +631,11 @@ static int post_config(
     return OK;
 }
 
-static void register_hooks(apr_pool_t *p){
+static void register_hooks(AVAHI_GCC_UNUSED apr_pool_t *p){
     ap_hook_post_config(post_config, NULL, NULL, APR_HOOK_LAST);
 }
 
-static void *create_server_config(apr_pool_t *p, server_rec *s) {
+static void *create_server_config(apr_pool_t *p, AVAHI_GCC_UNUSED server_rec *s) {
     struct global_config_data *d;
 
     d = apr_palloc(p, sizeof(struct global_config_data));
@@ -649,7 +650,7 @@ static void *create_server_config(apr_pool_t *p, server_rec *s) {
 
 static const char *cmd_dnssd_enable(
     cmd_parms *cmd,
-    void *mconfig,
+    AVAHI_GCC_UNUSED void *mconfig,
     int enable) {
 
     struct global_config_data *d = GET_CONFIG_DATA(cmd->server);
@@ -664,7 +665,7 @@ static const char *cmd_dnssd_enable(
 
 static const char *cmd_dnssd_enable_user_dir(
     cmd_parms *cmd,
-    void *mconfig,
+    AVAHI_GCC_UNUSED void *mconfig,
     int enable) {
 
     struct global_config_data *d = GET_CONFIG_DATA(cmd->server);
@@ -679,7 +680,7 @@ static const char *cmd_dnssd_enable_user_dir(
 
 static const char *cmd_dnssd_enable_vhost(
     cmd_parms *cmd,
-    void *mconfig,
+    AVAHI_GCC_UNUSED void *mconfig,
     int enable) {
 
     struct global_config_data *d = GET_CONFIG_DATA(cmd->server);
@@ -694,7 +695,7 @@ static const char *cmd_dnssd_enable_vhost(
 
 static const char *cmd_dnssd_service_name(
     cmd_parms *cmd,
-    void *mconfig,
+    AVAHI_GCC_UNUSED void *mconfig,
     const char *value) {
 
     const char *err;
@@ -710,7 +711,7 @@ static const char *cmd_dnssd_service_name(
 
 static const char *cmd_dnssd_service_type(
     cmd_parms *cmd,
-    void *mconfig,
+    AVAHI_GCC_UNUSED void *mconfig,
     const char *value) {
 
     const char *err;
