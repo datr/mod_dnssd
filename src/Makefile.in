@@ -32,8 +32,8 @@ distclean: clean
 maintainer-clean: clean
 	rm -f Makefile
 
-Makefile: Makefile.in
-	(cd .. && ../configure.status )
+Makefile: @srcdir@/Makefile.in
+	(cd .. && ./config.status )
 
 
 .PHONY: all install clean reload start restart stop mostlyclean distclean maintainer-clean distdir
