@@ -631,7 +631,7 @@ static int start_child_process(apr_pool_t *p, server_rec *server, struct global_
 }
 
 static int post_config(
-    apr_pool_t *pconf,
+    AVAHI_GCC_UNUSED apr_pool_t *pconf,
     AVAHI_GCC_UNUSED apr_pool_t *plog,
     AVAHI_GCC_UNUSED apr_pool_t *ptemp,
     server_rec *s) {
@@ -648,7 +648,7 @@ static int post_config(
     }
 
     if (d->enabled)
-        return start_child_process(pconf, s, d);
+        return start_child_process(s->process->pool, s, d);
 
     return OK;
 }
