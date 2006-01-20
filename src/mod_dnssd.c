@@ -378,7 +378,7 @@ static void create_service(struct service_data *j) {
                 p,
                 NULL) < 0) {
             
-            ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "avahi_entry_group_add_service(\"%s\") failed: %s\n", n, avahi_strerror(avahi_client_errno(r->client)));
+            ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "avahi_entry_group_add_service(\"%s\") failed: %s", n, avahi_strerror(avahi_client_errno(r->client)));
         }
     } else {
         
@@ -399,7 +399,7 @@ static void create_service(struct service_data *j) {
                     p, 
                     NULL) < 0) {
                 
-                ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "avahi_entry_group_add_service(\"%s\") failed: %s\n", n, avahi_strerror(avahi_client_errno(r->client)));
+                ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "avahi_entry_group_add_service(\"%s\") failed: %s", n, avahi_strerror(avahi_client_errno(r->client)));
             }
             
         }
