@@ -531,6 +531,8 @@ static void child_process(apr_pool_t *p, server_rec *server, struct global_confi
     
     ap_assert(d);
 
+    sleep(5);
+
     unixd_setup_child();
 
     if (pipe(sigterm_pipe_fds) < 0) {
@@ -542,6 +544,8 @@ static void child_process(apr_pool_t *p, server_rec *server, struct global_confi
     set_nonblock(sigterm_pipe_fds[1]);
 
     apr_signal(SIGTERM, sigterm);
+    apr_signal(SIGHUP, sigterm);
+    apr_signal(AP_SIG_GRACEFUL, SIG_IGN);
     
     r.main_server = server;
     r.global_config_data = d;
@@ -550,7 +554,7 @@ static void child_process(apr_pool_t *p, server_rec *server, struct global_confi
     r.services = NULL;
     apr_pool_create(&r.pool, p);
 
-/*     ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Child process startup pid=%lu", (unsigned long) getpid()); */
+     ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Child process startup pid=%lu", (unsigned long) getpid()); 
 
     assemble_services(&r);
 
@@ -573,7 +577,7 @@ static void child_process(apr_pool_t *p, server_rec *server, struct global_confi
         goto quit;
     }
     
-/*      ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Child process running");  */
+    ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Child process running");  
     
     avahi_simple_poll_loop(r.simple_poll);
 
@@ -596,7 +600,7 @@ quit:
 
     sigterm_pipe_fds[0] = sigterm_pipe_fds[1] = -1;
     
-/*     ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Child process ending");  */
+     ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Child process ending");
 }
 
 static int start_child_process(apr_pool_t *p, server_rec *server, struct global_config_data *d) {

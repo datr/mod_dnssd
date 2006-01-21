@@ -32,4 +32,7 @@ homepage: all dist
 	cp doc/README.html doc/style.css $$HOME/homepage/private/projects/mod_dnssd
 	ln -sf $$HOME/homepage/private/projects/mod_dnssd/README.html $$HOME/homepage/private/projects/mod_dnssd/index.html
 
-.PHONY: homepage
+distcleancheck:
+	@:
+	
+.PHONY: homepage distcleancheck
