@@ -160,6 +160,11 @@ the type <tt>_webdav._tcp</tt> and finally <i>The Blog</i> as type
 it fails to detect the correct one to use. It is seldomly used and you
 probably shouldn't bother.</p>
 
+<p>You might find this <a
+href="http://0pointer.de/blog/projects/mod_dnssd.html">blog
+article</a> I wrote enlightening which contains more examples how
+to make use of <tt>mod_dnssd</tt>.</p>
+
 <h2><a name="requirements">Requirements</a></h2>
 
 <p><tt>mod_dnssd</tt> requires a current release of Apache 2.0 with
