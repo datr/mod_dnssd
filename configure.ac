@@ -18,7 +18,7 @@
 # permissions and limitations under the License.
 
 AC_PREREQ(2.57)
-AC_INIT([mod_dnssd],[0.1],[mzzbqqaffq (at) 0pointer (dot) net])
+AC_INIT([mod_dnssd],[0.2],[mzzbqqaffq (at) 0pointer (dot) net])
 AC_CONFIG_SRCDIR([src/mod_dnssd.c])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([foreign 1.9 -Wall])

@@ -42,6 +42,9 @@ permissions and limitations under the License.</p>
 
 <h2><a name="news">News</a></h2>
 
+<div class="news-date">Sat Jan 21 2006: </div> <p class="news-text"><a
+href="@PACKAGE_URL@mod_dnssd-0.2.tar.gz">Version 0.2</a> released, changes include: handle graceful restarts properly, other smaller cleanups</p>
+
 <div class="news-date">Thu Jan 19 2006: </div> <p class="news-text"><a
 href="@PACKAGE_URL@mod_dnssd-0.1.tar.gz">Version 0.1</a> released,
 initial realease</p>
