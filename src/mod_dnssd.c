@@ -552,7 +552,7 @@ static void child_process(apr_pool_t *p, server_rec *server, struct global_confi
     r.services = NULL;
     apr_pool_create(&r.pool, p);
 
-     ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Child process startup pid=%lu", (unsigned long) getpid()); 
+/*      ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Child process startup pid=%lu", (unsigned long) getpid());  */
 
     assemble_services(&r);
 
@@ -575,7 +575,7 @@ static void child_process(apr_pool_t *p, server_rec *server, struct global_confi
         goto quit;
     }
     
-    ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Child process running");  
+/*     ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Child process running");   */
     
     avahi_simple_poll_loop(r.simple_poll);
 
@@ -598,7 +598,7 @@ quit:
 
     sigterm_pipe_fds[0] = sigterm_pipe_fds[1] = -1;
     
-     ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Child process ending");
+/*      ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Child process ending"); */
 }
 
 static int start_child_process(apr_pool_t *p, server_rec *server, struct global_config_data *d) {
@@ -633,7 +633,7 @@ static int start_child_process(apr_pool_t *p, server_rec *server, struct global_
 }
 
 static int post_config(
-    AVAHI_GCC_UNUSED apr_pool_t *pconf,
+    apr_pool_t *pconf,
     AVAHI_GCC_UNUSED apr_pool_t *plog,
     AVAHI_GCC_UNUSED apr_pool_t *ptemp,
     server_rec *s) {
