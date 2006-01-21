@@ -531,8 +531,6 @@ static void child_process(apr_pool_t *p, server_rec *server, struct global_confi
     
     ap_assert(d);
 
-    sleep(5);
-
     unixd_setup_child();
 
     if (pipe(sigterm_pipe_fds) < 0) {
@@ -621,7 +619,7 @@ static int start_child_process(apr_pool_t *p, server_rec *server, struct global_
             break;
             
         case APR_INPARENT:
-            apr_pool_note_subprocess(p, proc, APR_KILL_AFTER_TIMEOUT);
+            apr_pool_note_subprocess(p, proc, APR_KILL_ONLY_ONCE);
 /*             ap_log_error(APLOG_MARK, APLOG_NOTICE, status, server, "Child process %lu", (unsigned long) proc->pid); */
 
             break;
@@ -652,7 +650,7 @@ static int post_config(
     }
 
     if (d->enabled)
-        return start_child_process(s->process->pool, s, d);
+        return start_child_process(pconf, s, d);
 
     return OK;
 }
