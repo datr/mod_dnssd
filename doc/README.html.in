@@ -42,6 +42,9 @@ permissions and limitations under the License.</p>
 
 <h2><a name="news">News</a></h2>
 
+<div class="news-date">Sun Jan 22 2006: </div> <p class="news-text"><a
+href="@PACKAGE_URL@mod_dnssd-0.3.tar.gz">Version 0.3</a> released, changes include: fix compilation on FreeBSD and Mandriva; compatibility with Apache 2.2; fix a memory corruption bug</p>
+
 <div class="news-date">Sat Jan 21 2006: </div> <p class="news-text"><a
 href="@PACKAGE_URL@mod_dnssd-0.2.tar.gz">Version 0.2</a> released, changes include: handle graceful restarts properly, other smaller cleanups</p>
 
@@ -167,9 +170,9 @@ to make use of <tt>mod_dnssd</tt>.</p>
 
 <h2><a name="requirements">Requirements</a></h2>
 
-<p><tt>mod_dnssd</tt> requires a current release of Apache 2.0 with
+<p><tt>mod_dnssd</tt> requires a current release of Apache 2.x with
 <tt>apxs</tt> and a development installation of <a
-href="http://avahi.org/">Avahi</a> 0.6 or newer.</p>
+href="http://avahi.org/">Avahi</a> 0.6 or newer. <tt>mod_dnssd</tt> has been tested exclusively with <tt>mpm_prefork</tt>, your mileage with other MPMs may vary. (Please report successes or failures!)</p>
 
 <p><tt>mod_dnssd</tt> has been developed and tested on Debian GNU/Linux
 "testing" from January 2006, it should work on most other Linux
