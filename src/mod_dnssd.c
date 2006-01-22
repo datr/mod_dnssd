@@ -25,6 +25,7 @@
 #include <apr_strings.h>
 #include <unixd.h>
 #include <apr_signal.h>
+#include <mpm_common.h>
 
 #include <unistd.h>
 
@@ -264,7 +265,7 @@ static void assemble_services(struct runtime_data *r) {
             } else
                 u = pw->pw_name;
 
-            add_service(r, NULL, 0, apr_pstrcat(p_loop, "/~", pw->pw_name), apr_pstrcat(p_loop, u, " on ", NULL), NULL, 1);
+            add_service(r, NULL, 0, apr_pstrcat(p_loop, "/~", pw->pw_name, NULL), apr_pstrcat(p_loop, u, " on ", NULL), NULL, 1);
         }
 
         endpwent();
