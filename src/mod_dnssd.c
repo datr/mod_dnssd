@@ -811,7 +811,6 @@ static const command_rec commands[] = {
         NULL,
         OR_OPTIONS,
         "Set the IP port this service should be accessed with."),
-
     
     { NULL }
 };
