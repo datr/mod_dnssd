@@ -68,7 +68,7 @@ install: build
 	#$(MAKE) install DESTDIR=$(CURDIR)/debian/libapache2-mod-dnssd
 
         # Install into debian/libapache2-mod-dnssd.
-        # We need APXS = /bin/true, otherwise mod_mono will install everything
+        # We need APXS = /bin/true, otherwise mod_dnssd will install everything
         # in /usr instead of debian/libapache2-mod-dnssd.
 	$(MAKE) install \
 		DESTDIR=$(CURDIR)/debian/libapache2-mod-dnssd \
