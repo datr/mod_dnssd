@@ -1,0 +1,7 @@
+mod_dnssd for Debian
+--------------------
+
+mod_dnssd is an Apache HTTPD module which adds Zeroconf support via
+DNS-SD using Avahi.
+
+ -- Sébastien ESTIENNE <sebastien.estienne@gmail.com>  Tue, 31 Jan 2006 00:04:13 +0100
