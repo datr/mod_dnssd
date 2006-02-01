@@ -1,1 +1,1 @@
-LoadModule mono_dnssd /usr/lib/apache2/modules/mod_dnssd.so
+LoadModule dnssd_module /usr/lib/apache2/modules/mod_dnssd.so
