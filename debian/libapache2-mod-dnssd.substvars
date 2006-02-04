@@ -1,1 +1,0 @@
-shlibs:Depends=libavahi-client3 (>= 0.6.5), libavahi-common3 (>= 0.6.4), libc6 (>= 2.3.4-1)
