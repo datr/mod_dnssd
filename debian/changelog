@@ -1,6 +1,6 @@
 libapache2-mod-dnssd (0.3-1) unstable; urgency=low
 
-  * Initial release Closes: #349419
+  * Initial release (Closes: #349419)
 
  -- Sébastien ESTIENNE <sebastien.estienne@gmail.com>  Tue, 31 Jan 2006 00:04:13 +0100
 
