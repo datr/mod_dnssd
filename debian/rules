@@ -52,13 +52,6 @@ install: build
 	dh_testroot
 	dh_clean -k 
 	dh_installdirs
-
-        # Install into debian/libapache2-mod-dnssd.
-        # We need APXS = /bin/true, otherwise mod_dnssd will install everything
-        # in /usr instead of debian/libapache2-mod-dnssd.
-	$(MAKE) install \
-		DESTDIR=$(CURDIR)/debian/libapache2-mod-dnssd \
-		APXS=/bin/true
 	dh_install src/.libs/mod_dnssd.so `apxs2 -q LIBEXECDIR`
 
 # Build architecture-independent files here.
