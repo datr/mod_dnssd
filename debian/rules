@@ -59,11 +59,7 @@ install: build
 	$(MAKE) install \
 		DESTDIR=$(CURDIR)/debian/libapache2-mod-dnssd \
 		APXS=/bin/true
-	install -D -m755 src/.libs/mod_dnssd.so debian/libapache2-mod-dnssd/`apxs2 -q LIBEXECDIR`/mod_dnssd.so
-	install -D -m644 debian/libapache2-mod-dnssd.load debian/libapache2-mod-dnssd/etc/apache2/mods-available/mod_dnssd.load
-	install -D -m644 debian/libapache2-mod-dnssd.conf debian/libapache2-mod-dnssd/etc/apache2/mods-available/mod_dnssd.conf
-
-
+	dh_install src/.libs/mod_dnssd.so `apxs2 -q LIBEXECDIR`
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -76,6 +72,7 @@ binary-arch: build install
 	dh_installdocs
 	dh_installexamples
 	dh_installman
+	dh_install
 	dh_link
 	dh_strip
 	dh_compress

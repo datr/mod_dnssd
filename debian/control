@@ -2,7 +2,7 @@ Source: libapache2-mod-dnssd
 Section: web
 Priority: optional
 Maintainer: Sebastien ESTIENNE <sebastien.estienne@gmail.com>
-Build-Depends: debhelper (>= 4.0.0), autotools-dev, apache2-prefork-dev | apache2-threaded-dev, libavahi-client-dev (>= 0.6.4), lynx
+Build-Depends: debhelper (>= 5.0.0), autotools-dev, apache2-prefork-dev | apache2-threaded-dev, libavahi-client-dev (>= 0.6.4), lynx
 Standards-Version: 3.6.2
 
 Package: libapache2-mod-dnssd
