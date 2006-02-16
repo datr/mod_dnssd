@@ -1,2 +1,2 @@
-debian/libapache2-mod-dnssd.load /etc/apache2/mods-available
-debian/libapache2-mod-dnssd.conf /etc/apache2/mods-available
+debian/mod-dnssd.load /etc/apache2/mods-available
+debian/mod-dnssd.conf /etc/apache2/mods-available

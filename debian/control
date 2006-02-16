@@ -1,4 +1,4 @@
-Source: libapache2-mod-dnssd
+Source: mod-dnssd
 Section: web
 Priority: optional
 Maintainer: Sebastien ESTIENNE <sebastien.estienne@gmail.com>

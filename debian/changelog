@@ -1,4 +1,4 @@
-libapache2-mod-dnssd (0.3-1) unstable; urgency=low
+mod-dnssd (0.3-1) unstable; urgency=low
 
   * Initial release (Closes: #349419)
 
