@@ -70,6 +70,7 @@ struct global_config_data {
     int enabled;
     int user_dir;
     int vhost;
+    const char *user_dir_path;
 };
 
 static int sigterm_pipe_fds[2] = { -1, -1 };
@@ -246,7 +247,7 @@ static void assemble_services(struct runtime_data *r) {
             if (*pw->pw_dir == 0 || strcmp(pw->pw_dir, "/") == 0)
                 continue;
 
-            path = apr_pstrcat(p_loop, pw->pw_dir, "/public_html", NULL);
+            path = apr_pstrcat(p_loop, pw->pw_dir, "/", r->global_config_data->user_dir_path, NULL);
 
             if (apr_stat(&finfo, path, APR_FINFO_TYPE, p_loop) != APR_SUCCESS)
                 continue;
@@ -669,6 +670,7 @@ static void *create_server_config(apr_pool_t *p, AVAHI_GCC_UNUSED server_rec *s)
     d->enabled = 0;
     d->user_dir = 1;
     d->vhost = 1;
+    d->user_dir_path = "public_html";
 
     return d;
 }
@@ -715,6 +717,25 @@ static const char *cmd_dnssd_enable_vhost(
         return err;
 
     d->vhost = enable;
+    return NULL;
+}
+
+static const char *cmd_dnssd_user_dir_path(
+    cmd_parms *cmd,
+    AVAHI_GCC_UNUSED void *mconfig,
+    const char *value) {
+
+    struct global_config_data *d = GET_CONFIG_DATA(cmd->server);
+    const char *err;
+
+    if ((err = ap_check_cmd_context(cmd, GLOBAL_ONLY)))
+        return err;
+
+    if (value[0] == '~')
+        return "Bad syntax";
+
+    d->user_dir_path = value;
+
     return NULL;
 }
 
@@ -790,6 +811,13 @@ static const command_rec commands[] = {
         NULL,
         RSRC_CONF,
         "Enable/disable DNS-SD registration of all virtual hosts (default: yes)"),
+
+    AP_INIT_TAKE1(
+        "DNSSDUserDir",
+        cmd_dnssd_user_dir_path,
+        NULL,
+        RSRC_CONF,
+        "Set the user directory to use instead of public_html"),
     
     AP_INIT_TAKE1(
         "DNSSDServiceName",
