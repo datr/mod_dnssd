@@ -9,7 +9,7 @@ if [ "$1" != "remove" -a "$1" != "purge" ]; then
 fi
 
 if [ -e /etc/apache2/apache2.conf ]; then
-	/usr/sbin/a2dismod mod_dnssd || true
+	/usr/sbin/a2dismod mod-dnssd || true
 fi
 
 exit 0
