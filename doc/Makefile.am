@@ -14,17 +14,20 @@
 # implied.  See the License for the specific language governing
 # permissions and limitations under the License.
 
-noinst_DATA = README.html README
+noinst_DATA = README.html
 EXTRA_DIST = $(noinst_DATA) style.css README.html.in
 
-MAINTAINERCLEANFILES = README README.html
+MAINTAINERCLEANFILES = README.html
 CLEANFILES =
 
 if USE_LYNX
+noinst_DATA += README
+MAINTAINERCLEANFILES += README 
+CLEANFILES += README
+
 README: README.html
 	lynx --dump $^ | sed 's,file://localhost/.*/doc/README.html,README,' > $@
 
-CLEANFILES += README
 endif
 
 tidy: README.html

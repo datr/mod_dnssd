@@ -17,13 +17,18 @@
 EXTRA_DIST=bootstrap.sh LICENSE src/mod_dnssd.c src/Makefile.in
 SUBDIRS=src doc
 
-MAINTAINERCLEANFILES = README
-noinst_DATA = README LICENSE
+MAINTAINERCLEANFILES =
+noinst_DATA = LICENSE
+
+if USE_LYNX
+MAINTAINERCLEANFILES += README
+noinst_DATA += README
 
 README:
 	rm -f README
 	$(MAKE) -C doc README
 	cd $(srcdir) && ln -s doc/README README
+endif
 
 homepage: all dist
 	test -d $$HOME/homepage/private
