@@ -169,7 +169,7 @@ static void assemble_services(struct runtime_data *r) {
             struct service_data *marker = r->services;
             
             if ((colon = strrchr(v->args, ':')))
-                vport = (uint8_t) atoi(colon+1);
+                vport = (uint16_t) atoi(colon+1);
 
 /*             ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "VHOST: %s ", v->directive);  */
              
