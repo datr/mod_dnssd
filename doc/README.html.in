@@ -42,6 +42,9 @@ permissions and limitations under the License.</p>
 
 <h2><a name="news">News</a></h2>
 
+<div class="news-date">Sat Apr 1 2006: </div> <p class="news-text"><a
+href="@PACKAGE_URL@mod_dnssd-0.4.tar.gz">Version 0.4</a> released, changes include: deal properly with vhosts listening on ports != 80; add new <tt>DNSSDUserDir</tt> directive.</p>
+
 <div class="news-date">Sun Jan 22 2006: </div> <p class="news-text"><a
 href="@PACKAGE_URL@mod_dnssd-0.3.tar.gz">Version 0.3</a> released, changes include: fix compilation on FreeBSD and Mandriva; compatibility with Apache 2.2; fix a memory corruption bug</p>
 
@@ -76,7 +79,6 @@ DNSSDEnable on
 configured virtual hosts and the <tt>mod_userdir</tt> directories of
 all local users. For <tt>mod_userdir</tt> to work you need to load
 that module and configure it for the path <tt>~/public_html/</tt>.</p>
-
 
 <h3>Advanced Features</h3>
 
@@ -163,6 +165,16 @@ the type <tt>_webdav._tcp</tt> and finally <i>The Blog</i> as type
 it fails to detect the correct one to use. It is seldomly used and you
 probably shouldn't bother.</p>
 
+<p>The global directive <tt>DNSSDUserDir</tt> may be used to change
+the directory inside the user's home directory that is published by
+<tt>DNSSDAutoRegisterUserDir</tt>. This defaults to
+<tt>public_html</tt>. If you used the <tt>UserDir</tt> directive in
+your Apache configuration file you probably want to use this
+directive, too. Please note, however, that <tt>DNSSDUserDir</tt>
+doesn't accept the full syntax that <tt>UserDir</tt> accepts. In fact
+only the simplest form - a simple string without any <tt>*</tt> and
+without the <tt>/</tt> prefix - is accepted.</p>
+
 <p>You might find this <a
 href="http://0pointer.de/blog/projects/mod_dnssd.html">blog
 article</a> I wrote enlightening which contains more examples how
@@ -191,6 +203,8 @@ compilation and <tt>make install</tt> (as root) for installation of
 
 <p>This work was inspired by Sander Temme's and Sebastien Estienne's <a href="http://www.temme.net/sander/mod_zeroconf/">mod_zeroconf</a> module.</p>
 
+<p>Sebastien Estienne for packaging <tt>mod_dnssd</tt> for Debian.</p>
+
 <h2><a name="download">Download</a></h2>
 
 <p>The newest release is always available from <a href="@PACKAGE_URL@">@PACKAGE_URL@</a></p>
@@ -201,11 +215,13 @@ compilation and <tt>make install</tt> (as root) for installation of
 
 <pre>svn checkout svn://svn.0pointer.net/mod_dnssd/trunk mod_dnssd</pre>
 
+<p>You may find an up to date Debian package of <tt>mod_dnssd</tt> in the <a href="http://packages.debian.org/libapache2-mod-dnssd">Debian package repository</a>.</p>
+
 <p>If you want to be notified whenever I release a new version of this software use the subscription feature of <a href="http://freshmeat.net/projects/mod_dnssd/">Freshmeat</a>.</p>
 
 <hr/>
 
-<address class="grey">Lennart Poettering &lt;@PACKAGE_BUGREPORT@&gt;, January 2006</address>
+<address class="grey">Lennart Poettering &lt;@PACKAGE_BUGREPORT@&gt;, April 2006</address>
 
 <div class="grey"><i>$Id$</i></div>
 
