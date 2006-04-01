@@ -1,3 +1,15 @@
+mod-dnssd (0.4-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Sebastien ESTIENNE <sebastien.estienne@gmail.com>  Sat, 01 Apr 2006 14:39:10 +0200
+
+mod-dnssd (0.3-2) unstable; urgency=low
+
+  * fix prerm and postrm scripts to enable/disable the module
+
+ -- Sebastien ESTIENNE <sebastien.estienne@gmail.com>  Wed, 01 Mar 2006 17:20:52 +0100
+
 mod-dnssd (0.3-1) unstable; urgency=low
 
   * Initial release (Closes: #349419)
