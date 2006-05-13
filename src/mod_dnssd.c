@@ -141,10 +141,22 @@ static void assemble_services(struct runtime_data *r) {
     for (v = ap_conftree; v; v = v->next) {
         const char *a = v->args;
 
-        if (strcasecmp(v->directive, "ServerName") == 0)
-            default_host_name = ap_getword_conf(t, &a);
-        
-        else if (strcasecmp(v->directive, "Listen") == 0) {
+        if (strcasecmp(v->directive, "ServerName") == 0) {
+            const char *tdhn = NULL;
+            char *colon;
+            tdhn = ap_getword_conf(t, &a);
+            colon = strrchr(tdhn, ':');
+            if (colon) {
+                apr_size_t sz;
+                if (!default_port) {
+                        default_port = (uint16_t) atoi(colon+1);
+                }
+                sz = colon - tdhn;
+                default_host_name = apr_pstrndup(t, tdhn, sz);
+            } else {
+                default_host_name = tdhn;
+            }
+        } else if (strcasecmp(v->directive, "Listen") == 0) {
             char *sp;
             
             if (!default_port) {
@@ -178,8 +190,21 @@ static void assemble_services(struct runtime_data *r) {
                 
 /*                 ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "VHOST_INTERNAL %s | %s | %s | %s", l->directive, l->args, vname, vtypes);  */
 
-                if (strcasecmp(l->directive, "ServerName") == 0)
-                    host_name = ap_getword_conf(t, &a);
+                if (strcasecmp(l->directive, "ServerName") == 0) {
+                    const char *thn = NULL;
+                    thn = ap_getword_conf(t, &a);
+                    colon = strrchr(thn, ':');
+                    if (colon) {
+                        apr_size_t sz;
+                        if (!vport) {
+                                vport = (uint16_t) atoi(colon+1);
+                        }
+                        sz = colon - thn;
+                        host_name = apr_pstrndup(t, thn, sz);
+                    } else {
+                        host_name = thn;
+                    }
+                }
                 else if (strcasecmp(l->directive, "DNSSDServiceName") == 0)
                     vname = ap_getword_conf(t, &a);
                 else if (strcasecmp(l->directive, "DNSSDServiceTypes") == 0)
@@ -853,3 +878,4 @@ module AP_MODULE_DECLARE_DATA dnssd_module = {
     register_hooks         /* register hooks */
 };
 
+/* vim:set expandtab: */
