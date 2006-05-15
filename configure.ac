@@ -90,7 +90,6 @@ AC_ARG_WITH(apachectl,
     [ AC_PATH_PROGS(APACHECTL, [apache2ctl apachectl], "notfound", "$withval:$PATH") ], 
     [ AC_PATH_PROGS(APACHECTL, [apache2ctl apachectl], "notfound", "/usr/local/apache/bin:/usr/local/bin:/usr/sbin:$PATH")])
 
-
 #
 # Checking that we have Apache version 2
 #
