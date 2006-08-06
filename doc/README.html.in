@@ -80,6 +80,12 @@ configured virtual hosts and the <tt>mod_userdir</tt> directories of
 all local users. For <tt>mod_userdir</tt> to work you need to load
 that module and configure it for the path <tt>~/public_html/</tt>.</p>
 
+<p><b>Please note</b> that all <tt>ServerName</tt>s used in the Apache
+configuration files for services that shall be published with Avahi/DNS-SD need
+to be valid and in <a href="http://en.wikipedia.org/wiki/FQDN">FQDN format</a>, i.e. resolvable via mDNS or traditional DNS,
+and consist of at least two labels. (<tt>foobar</tt> does not qualify as such,
+but <tt>foobar.local</tt> does.)</p>
+
 <h3>Advanced Features</h3>
 
 <p>Five other directives are available: the global directive
