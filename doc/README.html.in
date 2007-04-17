@@ -10,7 +10,7 @@
 <body>
 <h1><a name="top">mod_dnssd @PACKAGE_VERSION@</a></h1>
 
-<p><i>Copyright 2006 Lennart Poettering &lt;@PACKAGE_BUGREPORT@&gt;</i></p>
+<p><i>Copyright 2006,2007 Lennart Poettering &lt;@PACKAGE_BUGREPORT@&gt;</i></p>
 
 <ul class="toc">
     <li><a href="#license">License</a></li>
@@ -26,7 +26,7 @@
 
 <h2><a name="license">License</a></h2>
 
-<p>Copyright 2006 Lennart Poettering</p>
+<p>Copyright 2006,2007 Lennart Poettering</p>
 
 <p>Licensed under the Apache License, Version 2.0 (the "License"); you
 may not use this file except in compliance with the License.  You may
@@ -41,6 +41,9 @@ implied.  See the License for the specific language governing
 permissions and limitations under the License.</p>
 
 <h2><a name="news">News</a></h2>
+
+<div class="news-date">Tue Apr 17 2007: </div> <p class="news-text"><a
+href="@PACKAGE_URL@mod_dnssd-0.5.tar.gz">Version 0.5</a> released, changes include: updated for Apache 2.2; for compatibility with older Apache versions please use <tt>mod_dnssd</tt> 0.4.</p>
 
 <div class="news-date">Sat Apr 1 2006: </div> <p class="news-text"><a
 href="@PACKAGE_URL@mod_dnssd-0.4.tar.gz">Version 0.4</a> released, changes include: deal properly with vhosts listening on ports != 80; add new <tt>DNSSDUserDir</tt> directive.</p>
@@ -188,7 +191,7 @@ to make use of <tt>mod_dnssd</tt>.</p>
 
 <h2><a name="requirements">Requirements</a></h2>
 
-<p><tt>mod_dnssd</tt> requires a current release of Apache 2.x with
+<p><tt>mod_dnssd</tt> requires a current release of Apache 2.2 with
 <tt>apxs</tt> and a development installation of <a
 href="http://avahi.org/">Avahi</a> 0.6 or newer. <tt>mod_dnssd</tt> has been tested exclusively with <tt>mpm_prefork</tt>, your mileage with other MPMs may vary. (Please report successes or failures!)</p>
 
@@ -227,7 +230,7 @@ compilation and <tt>make install</tt> (as root) for installation of
 
 <hr/>
 
-<address class="grey">Lennart Poettering &lt;@PACKAGE_BUGREPORT@&gt;, April 2006</address>
+<address class="grey">Lennart Poettering &lt;@PACKAGE_BUGREPORT@&gt;, April 2007</address>
 
 <div class="grey"><i>$Id$</i></div>
 
