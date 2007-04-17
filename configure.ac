@@ -18,7 +18,7 @@
 # permissions and limitations under the License.
 
 AC_PREREQ(2.59)
-AC_INIT([mod_dnssd],[0.4],[mzzbqqaffq (at) 0pointer (dot) net])
+AC_INIT([mod_dnssd],[0.5],[mzzbqqaffq (at) 0pointer (dot) net])
 AC_CONFIG_SRCDIR([src/mod_dnssd.c])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([foreign 1.9 -Wall])
@@ -75,6 +75,12 @@ if test "x$GCC" = "xyes" ; then
         fi
     done 
 fi
+
+PKG_PROG_PKG_CONFIG
+
+PKG_CHECK_MODULES(APR, [ apr-1])
+CFLAGS="$APR_CFLAGS $CFLAGS"
+LIBS="$APR_LIBS $LIBS"
 
 AC_ARG_WITH(apxs,
     AS_HELP_STRING(--with-apxs=PATH,/path/to/apxs),
