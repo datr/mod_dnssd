@@ -266,7 +266,7 @@ static void assemble_services(struct runtime_data *r) {
 
             apr_pool_clear(p_loop);
             
-            if (pw->pw_uid <= 500)
+            if (pw->pw_uid < 500)
                 continue;
 
             if (*pw->pw_dir == 0 || strcmp(pw->pw_dir, "/") == 0)
