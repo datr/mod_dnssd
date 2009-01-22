@@ -15,7 +15,7 @@
 # implied.  See the License for the specific language governing
 # permissions and limitations under the License.
 
-VERSION=1.9
+VERSION=1.10
 
 run_versioned() {
     local P
@@ -46,9 +46,12 @@ else
     rm -rf autom4te.cache
     rm -f config.cache
 
-    run_versioned aclocal "$VERSION"
-    run_versioned autoconf 2.59 -Wall
-    run_versioned autoheader 2.59
+    touch config.rpath
+
+    mkdir -p m4
+    run_versioned aclocal "$VERSION" -I m4
+    run_versioned autoconf 2.63 -Wall
+    run_versioned autoheader 2.63
     run_versioned automake "$VERSION" -a -c --foreign
 
     if test "x$NOCONFIGURE" = "x"; then
