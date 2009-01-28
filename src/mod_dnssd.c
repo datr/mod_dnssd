@@ -2,7 +2,7 @@
 
 /***
   Copyright 2006 Lennart Poettering
- 
+
   Licensed under the Apache License, Version 2.0 (the "License"); you
   may not use this file except in compliance with the License.  You
   may obtain a copy of the License at
@@ -43,17 +43,18 @@ struct runtime_data;
 struct service_data {
     struct runtime_data *runtime;
     apr_pool_t *pool;
-    
+
     char *host_name;
     uint16_t port;
     char *location;
     char *name;
+    apr_array_header_t *txt_record;
     apr_array_header_t *types;
     int append_host_name;
     char *chosen_name;
 
     AvahiEntryGroup *group;
-    
+
     struct service_data *next;
 };
 
@@ -81,7 +82,7 @@ module AP_MODULE_DECLARE_DATA dnssd_module;
 
 static int set_nonblock(int fd) {
     int n;
-    
+
     ap_assert(fd >= 0);
 
     if ((n = fcntl(fd, F_GETFL)) < 0)
@@ -93,12 +94,12 @@ static int set_nonblock(int fd) {
     return fcntl(fd, F_SETFL, n|O_NONBLOCK);
 }
 
-static void add_service(struct runtime_data *r, const char *host_name, uint16_t port, const char *location, const char *name, const char *types, int append_host_name) {
+static void add_service(struct runtime_data *r, const char *host_name, uint16_t port, const char *location, const char *name, const char *types, int append_host_name, const char *txt_record) {
     struct service_data *d;
     char *w;
     ap_assert(r);
 
-/*     ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "add_service: %s %s %s", host_name, location, name); */
+/*     ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "add_service: %s %s %s %s", host_name, location, name, txt_record); */
 
     d = apr_palloc(r->pool, sizeof(struct service_data));
     ap_assert(d);
@@ -117,7 +118,13 @@ static void add_service(struct runtime_data *r, const char *host_name, uint16_t 
     if (types)
         while (*(w = ap_getword_conf(r->pool, &types)) != 0)
             *(char**) apr_array_push(d->types) = w;
-        
+
+    d->txt_record = apr_array_make(r->pool, 4, sizeof(char*));
+
+    if (txt_record)
+        while (*(w = ap_getword_conf(r->pool, &txt_record)) != 0)
+            *(char**) apr_array_push(d->txt_record) = w;
+
     d->group = NULL;
 
     d->next = r->services;
@@ -133,7 +140,7 @@ static void assemble_services(struct runtime_data *r) {
     uint16_t default_port = 0;
     struct service_data *j;
     apr_pool_t *t;
-    
+
     ap_assert(r);
 
     apr_pool_create(&t, r->pool);
@@ -158,7 +165,7 @@ static void assemble_services(struct runtime_data *r) {
             }
         } else if (strcasecmp(v->directive, "Listen") == 0) {
             char *sp;
-            
+
             if (!default_port) {
                 char *colon;
 
@@ -171,23 +178,23 @@ static void assemble_services(struct runtime_data *r) {
         } else if (strcasecmp(v->directive, "DNSSDServicePort") == 0)
 
             default_port = (uint16_t) atoi(a);
-            
+
         else if (strcasecmp(v->directive, "<VirtualHost") == 0) {
             const char *host_name = NULL;
             uint16_t vport = 0;
-            const char *vname = NULL, *vtypes = NULL;
+            const char *vname = NULL, *vtypes = NULL, *txt_record = NULL;
             ap_directive_t *l;
             char *colon;
             struct service_data *marker = r->services;
-            
+
             if ((colon = strrchr(v->args, ':')))
                 vport = (uint16_t) atoi(colon+1);
 
 /*             ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "VHOST: %s ", v->directive);  */
-             
+
             for (l = v->first_child; l; l = l->next) {
                 a = l->args;
-                
+
 /*                 ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "VHOST_INTERNAL %s | %s | %s | %s", l->directive, l->args, vname, vtypes);  */
 
                 if (strcasecmp(l->directive, "ServerName") == 0) {
@@ -196,9 +203,8 @@ static void assemble_services(struct runtime_data *r) {
                     colon = strrchr(thn, ':');
                     if (colon) {
                         apr_size_t sz;
-                        if (!vport) {
-                                vport = (uint16_t) atoi(colon+1);
-                        }
+                        if (!vport)
+                            vport = (uint16_t) atoi(colon+1);
                         sz = colon - thn;
                         host_name = apr_pstrndup(t, thn, sz);
                     } else {
@@ -211,31 +217,35 @@ static void assemble_services(struct runtime_data *r) {
                     vtypes = a;
                 else if (strcasecmp(l->directive, "DNSSDServicePort") == 0)
                     vport = (uint16_t) atoi(a);
+                else if (strcasecmp(l->directive, "DNSSDServiceTxtRecord") == 0)
+                    txt_record = a;
                 else if (strcasecmp(l->directive, "<Location") == 0) {
                     ap_directive_t *s;
                     const char *sname = NULL, *stypes = NULL;
                     char *path;
                     size_t i;
                     uint16_t sport = 0;
-                    
+
                     path = apr_pstrdup(t, l->args);
-                    
+
                     if (*path != 0 && (path[(i = strlen(path) - 1)] == '>'))
                         path[i] = 0;
-                    
+
                     for (s = l->first_child; s; s = s->next) {
                         a = s->args;
-                        
+
                         if (strcasecmp(s->directive, "DNSSDServiceName") == 0)
                             sname = ap_getword_conf(t, &a);
                         else if (strcasecmp(s->directive, "DNSSDServiceTypes") == 0)
                             stypes = a;
+                        else if (strcasecmp(s->directive, "DNSSDServiceTxtRecord") == 0)
+                            txt_record = a;
                         else if (strcasecmp(s->directive, "DNSSDServicePort") == 0)
                             sport = (uint16_t) atoi(a);
                     }
 
                     if (sname)
-                        add_service(r, NULL, sport, path, sname, stypes, 0);
+                        add_service(r, NULL, sport, path, sname, stypes, 0, txt_record);
                 }
             }
 
@@ -246,9 +256,9 @@ static void assemble_services(struct runtime_data *r) {
                 j->host_name = apr_pstrdup(r->pool, host_name);
             }
 
-            if (r->global_config_data->vhost || vname || vtypes)
-                add_service(r, host_name, vport, NULL, vname ? vname : host_name, vtypes, 0);
-        } 
+            if (r->global_config_data->vhost || vname || vtypes || txt_record)
+                add_service(r, host_name, vport, NULL, vname ? vname : host_name, vtypes, 0, txt_record);
+        }
     }
 
 /*     ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "ping");  */
@@ -258,14 +268,14 @@ static void assemble_services(struct runtime_data *r) {
         apr_pool_t *p_loop;
 
         apr_pool_create(&p_loop, t);
-        
+
         while ((pw = getpwent())) {
             apr_finfo_t finfo;
             char *path;
             const char *u;
 
             apr_pool_clear(p_loop);
-            
+
             if (pw->pw_uid < 500)
                 continue;
 
@@ -282,7 +292,7 @@ static void assemble_services(struct runtime_data *r) {
 
             if (access(path, X_OK) != 0)
                 continue;
-            
+
             if (pw->pw_gecos && *pw->pw_gecos) {
                 char *comma;
                 u = apr_pstrdup(p_loop, pw->pw_gecos);
@@ -291,7 +301,7 @@ static void assemble_services(struct runtime_data *r) {
             } else
                 u = pw->pw_name;
 
-            add_service(r, NULL, 0, apr_pstrcat(p_loop, "/~", pw->pw_name, NULL), apr_pstrcat(p_loop, u, " on ", NULL), NULL, 1);
+            add_service(r, NULL, 0, apr_pstrcat(p_loop, "/~", pw->pw_name, NULL), apr_pstrcat(p_loop, u, " on ", NULL), NULL, 1, NULL);
         }
 
         endpwent();
@@ -301,15 +311,15 @@ static void assemble_services(struct runtime_data *r) {
 
     if (!default_port)
         default_port = 80;
-    
+
     /* Fill in missing data in all services */
     for (j = r->services; j; j = j->next) {
         if (!j->port)
             j->port = default_port;
-        
+
         if (!j->host_name)
             j->host_name = apr_pstrdup(r->pool, default_host_name);
-        
+
         if (!j->name)
             j->name = apr_pstrdup(r->pool, j->host_name);
     }
@@ -321,18 +331,18 @@ static void create_service(struct service_data *j);
 
 static void service_callback(AVAHI_GCC_UNUSED AvahiEntryGroup *g, AvahiEntryGroupState state, void *userdata) {
     struct service_data *j = userdata;
-    
+
     switch (state) {
         case AVAHI_ENTRY_GROUP_UNCOMMITED:
         case AVAHI_ENTRY_GROUP_REGISTERING:
         case AVAHI_ENTRY_GROUP_ESTABLISHED:
             break;
-            
+
         case AVAHI_ENTRY_GROUP_COLLISION: {
 
             char *n;
             ap_assert(j->chosen_name);
-            
+
             n = avahi_alternative_service_name(j->chosen_name);
             ap_log_error(APLOG_MARK, APLOG_WARNING, 0, j->runtime->main_server, "Name collision on '%s', changing to '%s'", j->chosen_name, n);
 
@@ -347,7 +357,7 @@ static void service_callback(AVAHI_GCC_UNUSED AvahiEntryGroup *g, AvahiEntryGrou
         case AVAHI_ENTRY_GROUP_FAILURE:
             ap_log_error(APLOG_MARK, APLOG_ERR, 0, j->runtime->main_server, "Failed to register service: %s", avahi_strerror(avahi_client_errno(j->runtime->client)));
             break;
-    }            
+    }
 }
 
 static void create_service(struct service_data *j) {
@@ -355,18 +365,21 @@ static void create_service(struct service_data *j) {
     const char *n;
     char *p;
     struct runtime_data *r = j->runtime;
-    
+    char **type, **txt_record;
+    AvahiStringList *strlist = NULL;
+
+
     if (!j->group)
         if (!(j->group = avahi_entry_group_new(r->client, service_callback, j))) {
             ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "avahi_entry_group_new() failed: %s", avahi_strerror(avahi_client_errno(r->client)));
             return;
         }
-    
+
     ap_assert(j->group);
     ap_assert(avahi_entry_group_is_empty(j->group));
 
     apr_pool_create(&t, r->pool);
-    
+
 /*         ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "Service <%s>, host <%s>, port <%u>, location <%s>", j->name, j->host_name, j->port, j->location); */
 
     if (j->chosen_name)
@@ -377,22 +390,30 @@ static void create_service(struct service_data *j) {
         n = apr_pstrcat(t, j->name, avahi_client_get_host_name(r->client), NULL);
     else
         n = j->name;
-    
+
     if (!j->pool)
         apr_pool_create(&j->pool, r->pool);
-    
+
     if (n != j->chosen_name) {
         apr_pool_clear(j->pool);
         j->chosen_name = apr_pstrdup(j->pool, n);
     }
-    
+
     p = j->location ? apr_pstrcat(t, "path=", j->location, NULL) : NULL;
-    
+
 /*         ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "%s, %s", p, n); */
-    
+
+    txt_record = (char **) j->txt_record->elts;
+
+    for ( ; *txt_record ; txt_record++)
+       strlist =  avahi_string_list_add(strlist, *txt_record);
+
+    if (p)
+        strlist = avahi_string_list_add(strlist, p);
+
     if (apr_is_empty_array(j->types)) {
-        
-        if (avahi_entry_group_add_service(
+
+        if (avahi_entry_group_add_service_strlst(
                 j->group,
                 AVAHI_IF_UNSPEC,
                 AVAHI_PROTO_UNSPEC,
@@ -402,18 +423,16 @@ static void create_service(struct service_data *j) {
                 NULL,
                 j->host_name,
                 j->port,
-                p,
-                NULL) < 0) {
-            
-            ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "avahi_entry_group_add_service(\"%s\") failed: %s", n, avahi_strerror(avahi_client_errno(r->client)));
+                strlist) < 0) {
+
+            ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "avahi_entry_group_add_service_strlst(\"%s\") failed: %s", n, avahi_strerror(avahi_client_errno(r->client)));
         }
+
     } else {
-        
-        char **type;
-        
+
         for (type = (char**) j->types->elts; *type; type++) {
-            
-            if (avahi_entry_group_add_service(
+
+            if (avahi_entry_group_add_service_strlst(
                     j->group,
                     AVAHI_IF_UNSPEC,
                     AVAHI_PROTO_UNSPEC,
@@ -423,22 +442,21 @@ static void create_service(struct service_data *j) {
                     NULL,
                     j->host_name,
                     j->port,
-                    p, 
-                    NULL) < 0) {
-                
-                ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "avahi_entry_group_add_service(\"%s\") failed: %s", n, avahi_strerror(avahi_client_errno(r->client)));
+                    strlist) < 0) {
+
+                ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "avahi_entry_group_add_service_strlst(\"%s\") failed: %s", n, avahi_strerror(avahi_client_errno(r->client)));
             }
-            
         }
-        
     }
-    
+
+    avahi_string_list_free(strlist);
+
     if (avahi_entry_group_is_empty(j->group)) {
         avahi_entry_group_free(j->group);
         j->group = NULL;
     } else
         avahi_entry_group_commit(j->group);
-    
+
     apr_pool_destroy(t);
 }
 
@@ -452,7 +470,7 @@ static void create_all_services(struct runtime_data *r) {
 
 static void reset_services(struct runtime_data *r) {
     struct service_data *j;
-    
+
     ap_assert(r);
 
     for (j = r->services; j; j = j->next) {
@@ -468,11 +486,11 @@ static void reset_services(struct runtime_data *r) {
 
 static void free_services(struct runtime_data *r) {
     struct service_data *j;
-    
+
     ap_assert(r);
 
     for (j = r->services; j; j = j->next) {
-        
+
         if (j->group) {
             avahi_entry_group_free(j->group);
             j->group = NULL;
@@ -493,7 +511,7 @@ static void client_callback(AvahiClient *c, AvahiClientState state, void *userda
     r->client = c;
 
 /*     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, r->main_server, "client_callback(%u)", state); */
-            
+
     switch (state) {
         case AVAHI_CLIENT_S_RUNNING:
             create_all_services(r);
@@ -513,20 +531,20 @@ static void client_callback(AvahiClient *c, AvahiClientState state, void *userda
 
                 if ((r->client = avahi_client_new(avahi_simple_poll_get(r->simple_poll), AVAHI_CLIENT_NO_FAIL, client_callback, r, &error)))
                     break;
-                
+
                 ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "avahi_client_new() failed: %s", avahi_strerror(error));
             } else
                 ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "Client failure: %s", avahi_strerror(avahi_client_errno(c)));
-            
+
             avahi_simple_poll_quit(r->simple_poll);
-            
+
             break;
 
         case AVAHI_CLIENT_CONNECTING:
         case AVAHI_CLIENT_S_REGISTERING:
             break;
     }
-    
+
 }
 
 static void sigterm(AVAHI_GCC_UNUSED int s) {
@@ -555,7 +573,7 @@ static void child_process(apr_pool_t *p, server_rec *server, struct global_confi
     int error;
     const AvahiPoll *api;
     AvahiWatch *w;
-    
+
     ap_assert(d);
 
     unixd_setup_child();
@@ -571,7 +589,7 @@ static void child_process(apr_pool_t *p, server_rec *server, struct global_confi
     apr_signal(SIGTERM, sigterm);
     apr_signal(SIGHUP, sigterm);
     apr_signal(AP_SIG_GRACEFUL, SIG_IGN);
-    
+
     r.main_server = server;
     r.global_config_data = d;
     r.client = NULL;
@@ -587,7 +605,7 @@ static void child_process(apr_pool_t *p, server_rec *server, struct global_confi
         ap_log_error(APLOG_MARK, APLOG_WARNING, 0, r.main_server, __FILE__": No services found to register");
         goto quit;
     }
-    
+
     if (!(r.simple_poll = avahi_simple_poll_new())) {
         ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "avahi_simple_poll_new() failed: %s", strerror(errno));
         goto quit;
@@ -596,14 +614,14 @@ static void child_process(apr_pool_t *p, server_rec *server, struct global_confi
     api = avahi_simple_poll_get(r.simple_poll);
     w = api->watch_new(api, sigterm_pipe_fds[0], AVAHI_WATCH_IN, watch_callback, &r);
     ap_assert(w);
-    
+
     if (!(r.client = avahi_client_new(avahi_simple_poll_get(r.simple_poll), AVAHI_CLIENT_NO_FAIL, client_callback, &r, &error))) {
         ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "avahi_client_new() failed: %s", avahi_strerror(error));
         goto quit;
     }
-    
+
 /*     ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Child process running");   */
-    
+
     avahi_simple_poll_loop(r.simple_poll);
 
 quit:
@@ -624,7 +642,7 @@ quit:
         close(sigterm_pipe_fds[1]);
 
     sigterm_pipe_fds[0] = sigterm_pipe_fds[1] = -1;
-    
+
 /*      ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Child process ending"); */
 }
 
@@ -633,24 +651,24 @@ static int start_child_process(apr_pool_t *p, server_rec *server, struct global_
     apr_status_t status;
 
 /*     ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, server, "Spawning child pid=%lu", (unsigned long) getpid()); */
-    
+
     proc = apr_palloc(p, sizeof(apr_proc_t));
     ap_assert(proc);
-    
+
     switch (status = apr_proc_fork(proc, p)) {
-        
+
         case APR_INCHILD:
             child_process(p, server, d);
             exit(1);
             /* never reached */
             break;
-            
+
         case APR_INPARENT:
             apr_pool_note_subprocess(p, proc, APR_KILL_ONLY_ONCE);
 /*             ap_log_error(APLOG_MARK, APLOG_NOTICE, status, server, "Child process %lu", (unsigned long) proc->pid); */
 
             break;
-            
+
         default:
             ap_log_error(APLOG_MARK, APLOG_ERR, status, server, "apr_proc_fork() failed");
             return HTTP_INTERNAL_SERVER_ERROR;
@@ -667,7 +685,7 @@ static int post_config(
 
     void *flag;
     struct global_config_data *d = GET_CONFIG_DATA(s);
-    
+
     /* All post_config hooks are called twice, we're only interested in the second call. */
 
     apr_pool_userdata_get(&flag, MOD_DNSSD_USERDATA_KEY, s->process->pool);
@@ -691,7 +709,7 @@ static void *create_server_config(apr_pool_t *p, AVAHI_GCC_UNUSED server_rec *s)
 
     d = apr_palloc(p, sizeof(struct global_config_data));
     ap_assert(d);
-    
+
     d->enabled = 0;
     d->user_dir = 1;
     d->vhost = 1;
@@ -789,7 +807,7 @@ static const char *cmd_dnssd_service_type(
 
     if ((err = ap_check_cmd_context(cmd, NOT_IN_DIRECTORY|NOT_IN_FILES|NOT_IN_LIMIT)))
         return err;
-    
+
     if (!avahi_is_valid_service_type_strict(value))
         return "Invalid service type";
 
@@ -814,8 +832,21 @@ static const char *cmd_dnssd_service_port(
     return NULL;
 }
 
+static const char *cmd_dnssd_service_txt_record(
+    cmd_parms *cmd,
+    AVAHI_GCC_UNUSED void *mconfig,
+    AVAHI_GCC_UNUSED const char *value) {
+
+    const char *err;
+
+    if ((err = ap_check_cmd_context(cmd, NOT_IN_DIRECTORY|NOT_IN_FILES|NOT_IN_LIMIT)))
+        return err;
+
+    return NULL;
+}
+
 static const command_rec commands[] = {
-    
+
     AP_INIT_FLAG(
         "DNSSDEnable",
         cmd_dnssd_enable,
@@ -843,7 +874,7 @@ static const command_rec commands[] = {
         NULL,
         RSRC_CONF,
         "Set the user directory to use instead of public_html"),
-    
+
     AP_INIT_TAKE1(
         "DNSSDServiceName",
         cmd_dnssd_service_name,
@@ -864,12 +895,19 @@ static const command_rec commands[] = {
         NULL,
         OR_OPTIONS,
         "Set the IP port this service should be accessed with."),
-    
+
+     AP_INIT_ITERATE(
+        "DNSSDServiceTxtRecord",
+        cmd_dnssd_service_txt_record,
+        NULL,
+        OR_OPTIONS,
+        "Set one or more DNS-SD TXT records"),
+
     { NULL }
 };
 
 module AP_MODULE_DECLARE_DATA dnssd_module = {
-    STANDARD20_MODULE_STUFF, 
+    STANDARD20_MODULE_STUFF,
     NULL,                  /* create per-dir    config structures */
     NULL,                  /* merge  per-dir    config structures */
     create_server_config,  /* create per-server config structures */
