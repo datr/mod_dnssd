@@ -17,11 +17,12 @@
 # implied.  See the License for the specific language governing
 # permissions and limitations under the License.
 
-AC_PREREQ(2.59)
-AC_INIT([mod_dnssd],[0.5],[mzzbqqaffq (at) 0pointer (dot) net])
+AC_PREREQ(2.63)
+AC_INIT([mod_dnssd],[0.6],[mzzbqqaffq (at) 0pointer (dot) net])
 AC_CONFIG_SRCDIR([src/mod_dnssd.c])
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE([foreign 1.9 -Wall])
+AM_INIT_AUTOMAKE([foreign 1.10 -Wall])
 
 AC_SUBST(PACKAGE_URL, [http://0pointer.de/lennart/projects/mod_dnssd/])
 
@@ -67,13 +68,13 @@ if test "x$GCC" = "xyes" ; then
 
     for flag in $DESIRED_FLAGS ; do
         AC_MSG_CHECKING([whether $CC accepts $flag])
-        if test_gcc_flag $flag ; then 
+        if test_gcc_flag $flag ; then
            CFLAGS="$CFLAGS $flag"
            AC_MSG_RESULT([yes])
         else
            AC_MSG_RESULT([no])
         fi
-    done 
+    done
 fi
 
 PKG_PROG_PKG_CONFIG
@@ -84,7 +85,7 @@ LIBS="$APR_LIBS $LIBS"
 
 AC_ARG_WITH(apxs,
     AS_HELP_STRING(--with-apxs=PATH,/path/to/apxs),
-    [ AC_PATH_PROGS(APXS, [apxs2 apxs], "notfound", "$withval:$PATH") ], 
+    [ AC_PATH_PROGS(APXS, [apxs2 apxs], "notfound", "$withval:$PATH") ],
     [ AC_PATH_PROGS(APXS, [apxs2 apxs], "notfound", "/usr/local/apache/bin:/usr/local/bin:/usr/sbin:$PATH")])
 
 if test "x$APXS" = "xnotfound" ; then
@@ -93,7 +94,7 @@ fi
 
 AC_ARG_WITH(apachectl,
     AS_HELP_STRING(--with-apachectl=PATH,/path/to/apachectl),
-    [ AC_PATH_PROGS(APACHECTL, [apache2ctl apachectl], "notfound", "$withval:$PATH") ], 
+    [ AC_PATH_PROGS(APACHECTL, [apache2ctl apachectl], "notfound", "$withval:$PATH") ],
     [ AC_PATH_PROGS(APACHECTL, [apache2ctl apachectl], "notfound", "/usr/local/apache/bin:/usr/local/bin:/usr/sbin:$PATH")])
 
 #
