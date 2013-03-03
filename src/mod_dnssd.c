@@ -610,12 +610,10 @@ static void client_callback(AvahiClient *c, AvahiClientState state, void *userda
     switch (state) {
         case AVAHI_CLIENT_S_RUNNING:
             create_all_services(r);
-            create_cnames(c);
             break;
 
         case AVAHI_CLIENT_S_COLLISION:
             reset_services(r);
-            if (_group) avahi_entry_group_reset(_group);
             break;
 
         case AVAHI_CLIENT_FAILURE:
@@ -634,19 +632,42 @@ static void client_callback(AvahiClient *c, AvahiClientState state, void *userda
                 ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "Client failure: %s", avahi_strerror(avahi_client_errno(c)));
 
             avahi_simple_poll_quit(r->simple_poll);
-            avahi_simple_poll_quit(_poll);
 
             break;
 
         case AVAHI_CLIENT_S_REGISTERING:
-            if (_group) avahi_entry_group_reset(_group);
-            break;
-
         case AVAHI_CLIENT_CONNECTING:
             /* do nothing */
             break;
     }
 
+}
+
+static void client_cnames_callback(AvahiClient *c, AvahiClientState state, AVAHI_GCC_UNUSED void * userdata) 
+{
+    struct runtime_data r;
+
+   /* Called whenever the client or server state changes */
+   switch (state) 
+   {
+      case AVAHI_CLIENT_S_RUNNING:
+         create_cnames(c);
+      break;
+
+      case AVAHI_CLIENT_FAILURE:
+         ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Client failure: %s", avahi_strerror(avahi_client_errno(c)));
+         avahi_simple_poll_quit(_poll);
+      break;
+
+      case AVAHI_CLIENT_S_COLLISION:
+      case AVAHI_CLIENT_S_REGISTERING:
+         if (_group) avahi_entry_group_reset(_group);
+      break;
+
+      case AVAHI_CLIENT_CONNECTING:
+         /* do nothing */
+      break;
+   }
 }
 
 /** cnames should be a NULL-terminated array of alias hostnames for this host.
@@ -664,7 +685,7 @@ void PublishAvahiCNames(const char ** cnames)
    if (_poll)
    {
       int error;
-      AvahiClient * client = avahi_client_new(avahi_simple_poll_get(_poll), (AvahiClientFlags) 0, client_callback, NULL, &error);
+      AvahiClient * client = avahi_client_new(avahi_simple_poll_get(_poll), (AvahiClientFlags) 0, client_cnames_callback, NULL, &error);
       if (client)
       {
          avahi_simple_poll_loop(_poll);
