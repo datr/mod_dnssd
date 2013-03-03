@@ -543,13 +543,12 @@ static void entry_group_callback(AvahiEntryGroup *g, AvahiEntryGroupState state,
 
 static void create_cnames(AvahiClient *c) 
 {
-    struct runtime_data *r = userdata;
-    ap_assert(r);
+    struct runtime_data r;
 
    /* If this is the first time we're called, let's create a new entry group if necessary */
    if ((!_group)&&(!(_group = avahi_entry_group_new(c, entry_group_callback, NULL))))
    {
-      ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "avahi_entry_group_new() failed: %s", avahi_strerror(avahi_client_errno(c)));
+      ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "avahi_entry_group_new() failed: %s", avahi_strerror(avahi_client_errno(c)));
       goto fail;
    }
 
@@ -581,7 +580,7 @@ static void create_cnames(AvahiClient *c)
          if (ret >= 0) ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, r->main_server, "Published DNS-SD hostname alias [%s]", _cnames[i]);
          else
          {
-            ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "Failed to add CNAME record [%s]: %s", _cnames[i], avahi_strerror(ret));
+            ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Failed to add CNAME record [%s]: %s", _cnames[i], avahi_strerror(ret));
             goto fail;
          }
       }
@@ -589,7 +588,7 @@ static void create_cnames(AvahiClient *c)
       int ret = avahi_entry_group_commit(_group);
       if (ret < 0)
       {
-         ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "Failed to commit entry group: %s", avahi_strerror(ret));
+         ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Failed to commit entry group: %s", avahi_strerror(ret));
          goto fail;
       }
    }
@@ -657,9 +656,8 @@ static void client_callback(AvahiClient *c, AvahiClientState state, void *userda
   */
 void PublishAvahiCNames(const char ** cnames)
 {
-    struct runtime_data *r = userdata;
-    ap_assert(r);
-    
+    struct runtime_data r;
+
    _cnames = cnames;
 
    /* Allocate main loop object */
@@ -673,11 +671,11 @@ void PublishAvahiCNames(const char ** cnames)
          avahi_simple_poll_loop(_poll);
          avahi_client_free(client);
       }
-      else ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "Failed to create Avahi client: %s", avahi_strerror(error));
+      else ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Failed to create Avahi client: %s", avahi_strerror(error));
 
       avahi_simple_poll_free(_poll);
    }
-   else ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "Failed to create Avahi simple poll object.");
+   else ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Failed to create Avahi simple poll object.");
 }
 
 static void sigterm(AVAHI_GCC_UNUSED int s) {
