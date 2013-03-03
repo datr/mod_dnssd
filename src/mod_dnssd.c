@@ -577,7 +577,7 @@ static void create_cnames(AvahiClient *c)
       for (i=0; (_cnames[i] != NULL); i++)
       {
          int ret = avahi_entry_group_add_record(_group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, (AvahiPublishFlags)(AVAHI_PUBLISH_USE_MULTICAST|AVAHI_PUBLISH_ALLOW_MULTIPLE), _cnames[i], AVAHI_DNS_CLASS_IN, AVAHI_DNS_TYPE_CNAME, AVAHI_DEFAULT_TTL, hostname, hostnameLen+1); 
-         if (ret >= 0) ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, r->main_server, "Published DNS-SD hostname alias [%s]", _cnames[i]);
+         if (ret >= 0) ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, r.main_server, "Published DNS-SD hostname alias [%s]", _cnames[i]);
          else
          {
             ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Failed to add CNAME record [%s]: %s", _cnames[i], avahi_strerror(ret));
