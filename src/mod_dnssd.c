@@ -24,7 +24,6 @@
 #include <ap_config.h>
 #include <apr_strings.h>
 #include <unixd.h>
-#include <mod_unixd.h>
 #include <apr_signal.h>
 #include <mpm_common.h>
 
@@ -701,7 +700,7 @@ static void child_process(apr_pool_t *p, server_rec *server, struct global_confi
 
     ap_assert(d);
 
-    ap_unixd_setup_child();
+    unixd_setup_child();
 
     if (pipe(sigterm_pipe_fds) < 0) {
         ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "pipe() failed: %s", strerror(errno));
