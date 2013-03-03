@@ -520,15 +520,14 @@ static void free_services(struct runtime_data *r) {
 /* Called whenever the entry group state changes */
 static void entry_group_callback(AvahiEntryGroup *g, AvahiEntryGroupState state, AVAHI_GCC_UNUSED void *userdata) 
 {
-    struct runtime_data *r = userdata;
-    ap_assert(r);
+    struct runtime_data r;
 
    assert(g == _group || _group == NULL);
    _group = g;
 
    switch (state) {
       case AVAHI_ENTRY_GROUP_FAILURE :
-         ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->main_server, "Entry group failure: %s", avahi_strerror(avahi_client_errno(avahi_entry_group_get_client(g))));
+         ap_log_error(APLOG_MARK, APLOG_ERR, 0, r.main_server, "Entry group failure: %s", avahi_strerror(avahi_client_errno(avahi_entry_group_get_client(g))));
          avahi_simple_poll_quit(_poll);
       break;
 
